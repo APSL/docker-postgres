@@ -1,0 +1,11 @@
+postgres:
+  image: apsl/postgres
+  environment:
+    AWS_ACCESS_KEY_ID: 
+    AWS_SECRET_ACCESS_KEY: 
+    WALE_S3_PREFIX:  s3://bucket/dir
+    PGDATA: /var/lib/postgresql/data/pgdata
+    POSTGRES_PASSWORD: postgrespassword
+    WALE_RETAIN: 10
+  volumes:
+    - "./data:/var/lib/postgresql/data"

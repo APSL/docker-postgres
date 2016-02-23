@@ -1,7 +1,0 @@
-postgres:
-  image: apsl/postgres
-  environment:
-    AWS_SECRET_ACCESS_KEY: AKIAJ63PCKBE77S5TLMQ
-    AWS_ACCESS_KEY_ID: ETowN1TqLHT8a4yeOEso8NuNODm+zO4CFBc67WlJ
-    WALE_S3_PREFIX:  s3://apsl-wale/testdocker
-    PGDATA: /var/lib/postgresql/data/pgdata

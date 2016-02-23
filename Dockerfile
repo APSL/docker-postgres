@@ -20,10 +20,21 @@ RUN apt-get update \
       && rm -rf /var/lib/apt/lists/*
 
 RUN pip install pip --upgrade
-RUN pip install wal-e==$WALE_VERSION requests==2.8.1 six==1.10.0
+RUN pip install wal-e==$WALE_VERSION requests==2.8.1 envtpl==0.4.1
+# exit 0 is necessary to bypass a problem in docker with overlay: https://github.com/pypa/pip/issues/2953
+RUN pip install six==1.10.0; true
 
 RUN apt-get purge -y build-essential libevent-dev python-dev 
       
 RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/postgis.sh
-COPY ./initdb-wale.sh /docker-entrypoint-initdb.d/wale.sh
+
+COPY postgresql.conf.tpl /etc/postgres/postgresql.conf.tpl
+COPY backup-wale.sh /usr/local/bin/backup-wale.sh
+COPY clean-wale.sh /usr/local/bin/clean-wale.sh
+COPY crontab /etc/postgres/crontab
+RUN crontab -u postgres /etc/postgres/crontab 
+
+# Necessary overwrite to configure postgres via env vars
+# Original https://github.com/docker-library/postgres/blob/443c7947d548b1c607e06f7a75ca475de7ff3284/9.5/docker-entrypoint.sh
+COPY docker-entrypoint.sh /
