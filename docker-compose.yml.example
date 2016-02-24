@@ -6,6 +6,22 @@ postgres:
     WALE_S3_PREFIX:  s3://bucket/dir
     PGDATA: /var/lib/postgresql/data/pgdata
     POSTGRES_PASSWORD: postgrespassword
-    WALE_RETAIN: 10
   volumes:
     - "./data:/var/lib/postgresql/data"
+wale:
+  image: apsl/postgres
+  command: "cron"
+  volumes_from: 
+    - postgres
+  links:
+    - postgres:postgres
+  environment:
+    AWS_ACCESS_KEY_ID: 
+    AWS_SECRET_ACCESS_KEY: 
+    WALE_S3_PREFIX:  s3://bucket/dir
+    PGDATA: /var/lib/postgresql/data/pgdata
+    WALE_RETAIN: 10
+    PGHOST: postgres
+    PGUSER: postgres
+    PGPORT: 5432
+    PGPASSWORD: postgrespassword

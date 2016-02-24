@@ -1,5 +1,18 @@
 #!/bin/bash
 set -e
+function configure_wale() {
+    # Configure env dir for wal-e
+    mkdir -p /etc/wal-e.d/env
+    echo $AWS_ACCESS_KEY_ID > /etc/wal-e.d/env/AWS_ACCESS_KEY_ID
+    echo $AWS_SECRET_ACCESS_KEY > /etc/wal-e.d/env/AWS_SECRET_ACCESS_KEY
+    echo $WALE_S3_PREFIX > /etc/wal-e.d/env/WALE_S3_PREFIX
+    echo $PGDATA > /etc/wal-e.d/env/PGDATA
+    # Default WALE retention of base backups
+    if [ -z "$WALE_RETAIN" ]; then WALE_RETAIN=10; fi
+    echo $WALE_RETAIN > /etc/wal-e.d/env/WALE_RETAIN
+    chown root:postgres -R /etc/wal-e.d
+    chmod 755 -R /etc/wal-e.d
+}
 
 if [ "$1" = 'postgres' ]; then
         mkdir -p "$PGDATA"
@@ -89,22 +102,16 @@ EOSQL
                 echo
         fi
 
-        # Configure env dir for wal-e
-        mkdir -p /etc/wal-e.d/env
-        echo $AWS_ACCESS_KEY_ID > /etc/wal-e.d/env/AWS_ACCESS_KEY_ID
-        echo $AWS_SECRET_ACCESS_KEY > /etc/wal-e.d/env/AWS_SECRET_ACCESS_KEY
-        echo $WALE_S3_PREFIX > /etc/wal-e.d/env/WALE_S3_PREFIX
-        echo $PGDATA > /etc/wal-e.d/env/PGDATA
-        # Default WALE retention of base backups
-        if [ -z "$WALE_RETAIN" ]; then WALE_RETAIN=10; fi
-        echo $WALE_RETAIN > /etc/wal-e.d/env/WALE_RETAIN
-        chown root:postgres -R /etc/wal-e.d
-        chmod 755 -R /etc/wal-e.d
+        configure_wale
         
         # Configure postgres via envtpl
         envtpl /etc/postgres/postgresql.conf.tpl --allow-missing --keep-template
         
         exec gosu postgres "$@" -c config_file=/etc/postgres/postgresql.conf
+
+elif [ "$1" = 'cron' ]; then
+    configure_wale
+    exec go-cron -file="/etc/postgres/crontab"
 fi
 
 exec "$@" 

@@ -30,10 +30,11 @@ RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/postgis.sh
 
 COPY postgresql.conf.tpl /etc/postgres/postgresql.conf.tpl
+COPY backup-list.sh /usr/local/bin/backup-list.sh
 COPY backup-wale.sh /usr/local/bin/backup-wale.sh
 COPY clean-wale.sh /usr/local/bin/clean-wale.sh
 COPY crontab /etc/postgres/crontab
-RUN crontab -u postgres /etc/postgres/crontab 
+COPY go-cron /sbin/
 
 # Necessary overwrite to configure postgres via env vars
 # Original https://github.com/docker-library/postgres/blob/443c7947d548b1c607e06f7a75ca475de7ff3284/9.5/docker-entrypoint.sh
