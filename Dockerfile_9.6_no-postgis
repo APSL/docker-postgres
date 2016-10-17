@@ -1,5 +1,5 @@
 # https://hub.docker.com/_/postgres/
-FROM postgres:9.6-rc1
+FROM postgres:9.6.0
 MAINTAINER Edu Herraiz <eherraiz@apsl.net>
 # Based on : https://github.com/appropriate/docker-postgis
 # but without postgis
@@ -28,6 +28,8 @@ RUN pip install six==1.10.0; true
 RUN apt-get purge -y build-essential libevent-dev python-dev
 
 RUN mkdir -p /docker-entrypoint-initdb.d
+
+ENV MAX_PARALLEL_WORKERS=0
 
 COPY postgresql.conf.tpl /etc/postgres/postgresql.conf.tpl
 COPY backup-list.sh /usr/local/bin/backup-list.sh

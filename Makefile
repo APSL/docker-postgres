@@ -3,7 +3,7 @@ all: build
 TAG=9.5.4
 IMAGE=apsl/postgres:$(TAG)
 
-TAG_NOPOSTGIS=9.6-rc1-nopostgis
+TAG_NOPOSTGIS=9.6.0-nopostgis
 IMAGE_NOPOSTGIS=apsl/postgres:$(TAG_NOPOSTGIS)
 
 build:
