@@ -1,13 +1,13 @@
 # https://hub.docker.com/_/postgres/
-FROM postgres:9.5.4
+FROM postgres:9.6.0
 MAINTAINER Edu Herraiz <eherraiz@apsl.net>
 # Based on : https://github.com/appropriate/docker-postgis
 
-ENV POSTGIS_MAJOR 2.2
-ENV POSTGIS_VERSION 2.2.2+dfsg-4.pgdg80+1
-ENV WALE_VERSION 0.8.1
+ENV POSTGIS_MAJOR 2.3
+ENV POSTGIS_VERSION 2.3.0+dfsg-2.pgdg80+1
+ENV WALE_VERSION 1.0.1
 # useful for security updates
-ENV LAST_UPDATE 2016-09-23
+ENV LAST_UPDATE 2016-11-08
 
 RUN apt-get update \
     && apt-get dist-upgrade -yd \
@@ -15,20 +15,21 @@ RUN apt-get update \
            postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR=$POSTGIS_VERSION \
            postgis=$POSTGIS_VERSION \
            lzop \
-           python-pip \
-           pv \
-           python-dev \
+           python3 \
+           python3-dev \
            libevent-dev \
            build-essential \
            daemontools \
+           wget \
+           pv \
       && rm -rf /var/lib/apt/lists/*
 
-RUN pip install pip --upgrade
-RUN pip install wal-e==$WALE_VERSION requests==2.10.0 envtpl==0.4.1
+RUN wget https://bootstrap.pypa.io/get-pip.py --no-check-certificate; python3 get-pip.py;
+RUN pip install wal-e==$WALE_VERSION requests==2.10.0 envtpl==0.4.1 boto==2.43.0
 # exit 0 is necessary to bypass a problem in docker with overlay: https://github.com/pypa/pip/issues/2953
 RUN pip install six==1.10.0; true
 
-RUN apt-get purge -y build-essential libevent-dev python-dev
+RUN apt-get purge -y build-essential libevent-dev python3-dev
 
 RUN mkdir -p /docker-entrypoint-initdb.d
 COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/postgis.sh

@@ -384,7 +384,7 @@ archive_timeout = {{ ARCHIVE_TIMEOUT | default(1800) }}          # force a logfi
                                         #   warning
                                         #   error
 
-#log_min_messages = warning             # values in order of decreasing detail:
+log_min_messages = debug1             # values in order of decreasing detail:
                                         #   debug5
                                         #   debug4
                                         #   debug3
@@ -646,3 +646,4 @@ default_text_search_config = 'pg_catalog.english'
 # https://www.postgresql.org/docs/9.6/static/runtime-config-resource.html#GUC-MAX-PARALLEL-WORKERS-PER-GATHER
 # 0 disabled
 max_parallel_workers_per_gather = {{ MAX_PARALLEL_WORKERS | default('0') }}
+huge_pages = off

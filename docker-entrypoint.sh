@@ -6,6 +6,7 @@ function configure_wale() {
     echo $AWS_ACCESS_KEY_ID > /etc/wal-e.d/env/AWS_ACCESS_KEY_ID
     echo $AWS_SECRET_ACCESS_KEY > /etc/wal-e.d/env/AWS_SECRET_ACCESS_KEY
     echo $WALE_S3_PREFIX > /etc/wal-e.d/env/WALE_S3_PREFIX
+    echo $AWS_REGION > /etc/wal-e.d/env/AWS_REGION
     echo $PGDATA > /etc/wal-e.d/env/PGDATA
     # Default WALE retention of base backups
     if [ -z "$WALE_RETAIN" ]; then WALE_RETAIN=10; fi
@@ -15,7 +16,9 @@ function configure_wale() {
     mkdir -p /etc/wal-e.d/env_recover
     echo $RECOVER_AWS_ACCESS_KEY_ID > /etc/wal-e.d/env_recover/AWS_ACCESS_KEY_ID
     echo $RECOVER_AWS_SECRET_ACCESS_KEY > /etc/wal-e.d/env_recover/AWS_SECRET_ACCESS_KEY
+    echo $RECOVER_AWS_REGION > /etc/wal-e.d/env_recover/AWS_REGION
     echo $RECOVER_WALE_S3_PREFIX > /etc/wal-e.d/env_recover/WALE_S3_PREFIX
+
     
     chown root:postgres -R /etc/wal-e.d
     chmod 755 -R /etc/wal-e.d
@@ -36,10 +39,39 @@ if [ "$1" = 'postgres' ]; then
                 
             # First we check if we can recover from WALE
             if [ "$RECOVER_WALE" = 'True' ]; then
-                /usr/bin/envdir /etc/wal-e.d/env_recover /usr/local/bin/wal-e 
-                echo "restore_command = 'envdir /etc/wal-e.d/env wal-e wal-fetch \"%f\" \"%p\"'" > $PGDATA/recovery.conf
+                echo
+                echo 'Restoring PostgreSQL from Wal-e latest backup.'
+                echo
+                /usr/bin/envdir /etc/wal-e.d/env_recover /usr/local/bin/wal-e backup-fetch $PGDATA LATEST
+                #echo "restore_command = 'envdir /etc/wal-e.d/env_recover wal-e wal-fetch \"%f\" \"%p\"'" > $PGDATA/recovery.conf
+                # check password first so we can output the warning before postgres
+                # messes it up
+                if [ "$POSTGRES_PASSWORD" ]; then
+                        pass="PASSWORD '$POSTGRES_PASSWORD'"
+                        authMethod=md5  
+                else
+                        # The - option suppresses leading tabs but *not* spaces. :)
+                        cat >&2 <<-'EOWARN'
+                                ****************************************************
+                                WARNING: No password has been set for the database.
+                                         This will allow anyone with access to the
+                                         Postgres port to access your database. In
+                                         Docker's default configuration, this is
+                                         effectively any other container on the same
+                                         system.
+
+                                         Use "-e POSTGRES_PASSWORD=password" to set
+                                         it in "docker run".
+                                ****************************************************
+EOWARN
+
+                        pass=
+                        authMethod=trust
+                fi
+
+                { echo; echo "host all all 0.0.0.0/0 $authMethod"; } >> "$PGDATA/pg_hba.conf"
+                                
             else
-            
                 gosu postgres initdb
 
                 # check password first so we can output the warning before postgres
@@ -120,9 +152,14 @@ EOSQL
         fi
 
         
-        # Configure postgres via envtpl
+        echo
+        echo 'PostgreSQL configure to /etc/postgres/postgresql.conf'
+        echo
         envtpl /etc/postgres/postgresql.conf.tpl --allow-missing --keep-template
-        
+
+        echo
+        echo 'Initiating PostgreSQL'
+        echo
         exec gosu postgres "$@" -c config_file=/etc/postgres/postgresql.conf
 
 elif [ "$1" = 'cron' ]; then
