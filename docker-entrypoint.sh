@@ -10,6 +10,13 @@ function configure_wale() {
     # Default WALE retention of base backups
     if [ -z "$WALE_RETAIN" ]; then WALE_RETAIN=10; fi
     echo $WALE_RETAIN > /etc/wal-e.d/env/WALE_RETAIN
+
+    #Recover enviroment
+    mkdir -p /etc/wal-e.d/env_recover
+    echo $RECOVER_AWS_ACCESS_KEY_ID > /etc/wal-e.d/env_recover/AWS_ACCESS_KEY_ID
+    echo $RECOVER_AWS_SECRET_ACCESS_KEY > /etc/wal-e.d/env_recover/AWS_SECRET_ACCESS_KEY
+    echo $RECOVER_WALE_S3_PREFIX > /etc/wal-e.d/env_recover/WALE_S3_PREFIX
+    
     chown root:postgres -R /etc/wal-e.d
     chmod 755 -R /etc/wal-e.d
 }
@@ -22,8 +29,17 @@ if [ "$1" = 'postgres' ]; then
         chmod g+s /run/postgresql
         chown -R postgres /run/postgresql
 
+        configure_wale
+        
         # look specifically for PG_VERSION, as it is expected in the DB dir
         if [ ! -s "$PGDATA/PG_VERSION" ]; then
+                
+            # First we check if we can recover from WALE
+            if [ "$RECOVER_WALE" = 'True' ]; then
+                /usr/bin/envdir /etc/wal-e.d/env_recover /usr/local/bin/wal-e 
+                echo "restore_command = 'envdir /etc/wal-e.d/env wal-e wal-fetch \"%f\" \"%p\"'" > $PGDATA/recovery.conf
+            else
+            
                 gosu postgres initdb
 
                 # check password first so we can output the warning before postgres
@@ -100,9 +116,9 @@ EOSQL
                 echo
                 echo 'PostgreSQL init process complete; ready for start up.'
                 echo
+            fi
         fi
 
-        configure_wale
         
         # Configure postgres via envtpl
         envtpl /etc/postgres/postgresql.conf.tpl --allow-missing --keep-template

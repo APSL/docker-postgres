@@ -204,7 +204,7 @@ wal_level = minimal                    # minimal, archive, hot_standby, or logic
 checkpoint_timeout = {{ CHECKPOINT_TIMEOUT | default('5min') }} # range 30s-1h
 max_wal_size = {{ MAX_WAL_SIZE | default('1GB') }}
 min_wal_size = {{ MIN_WAL_SIZE | default('80MB') }}
-checkpoint_completion_target = {{ CHECKPOINT_COMPLETION_TARGET | default (0.5) }}     # checkpoint target duration, 0.0 - 1.0
+checkpoint_completion_target = {{ CHECKPOINT_COMPLETION_TARGET | default (0.9) }}     # checkpoint target duration, 0.0 - 1.0
 #checkpoint_warning = 30s               # 0 disables
 
 # - Archiving -
