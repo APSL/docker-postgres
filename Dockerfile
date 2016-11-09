@@ -1,5 +1,5 @@
 # https://hub.docker.com/_/postgres/
-FROM postgres:9.6.0
+FROM postgres:9.6.1
 MAINTAINER Edu Herraiz <eherraiz@apsl.net>
 # Based on : https://github.com/appropriate/docker-postgis
 
@@ -13,6 +13,7 @@ RUN apt-get update \
     && apt-get dist-upgrade -yd \
     && apt-get install -y --no-install-recommends \
            postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR=$POSTGIS_VERSION \
+           postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts=$POSTGIS_VERSION \
            postgis=$POSTGIS_VERSION \
            lzop \
            python3 \

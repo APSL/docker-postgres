@@ -384,7 +384,7 @@ archive_timeout = {{ ARCHIVE_TIMEOUT | default(1800) }}          # force a logfi
                                         #   warning
                                         #   error
 
-log_min_messages = debug1             # values in order of decreasing detail:
+log_min_messages = {{ POSTGRES_DEBUG_LEVEL | default('error') }} # values in order of decreasing detail:
                                         #   debug5
                                         #   debug4
                                         #   debug3

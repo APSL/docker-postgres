@@ -30,9 +30,14 @@ if [ "$1" = 'postgres' ]; then
         chown -R postgres "$PGDATA"
 
         chmod g+s /run/postgresql
-        chown -R postgres /run/postgresql
+        chown -R postgres:postgres /run/postgresql
 
         configure_wale
+        
+        echo
+        echo 'PostgreSQL configure to /etc/postgres/postgresql.conf'
+        echo
+        envtpl /etc/postgres/postgresql.conf.tpl --allow-missing --keep-template
         
         # look specifically for PG_VERSION, as it is expected in the DB dir
         if [ ! -s "$PGDATA/PG_VERSION" ]; then
@@ -43,7 +48,12 @@ if [ "$1" = 'postgres' ]; then
                 echo 'Restoring PostgreSQL from Wal-e latest backup.'
                 echo
                 /usr/bin/envdir /etc/wal-e.d/env_recover /usr/local/bin/wal-e backup-fetch $PGDATA LATEST
-                #echo "restore_command = 'envdir /etc/wal-e.d/env_recover wal-e wal-fetch \"%f\" \"%p\"'" > $PGDATA/recovery.conf
+                
+                echo "restore_command = 'envdir /etc/wal-e.d/env_recover wal-e wal-fetch \"%f\" \"%p\"'" > $PGDATA/recovery.conf
+                chown postgres:postgres "$PGDATA/recovery.conf"
+                
+                chmod 700 -R $PGDATA
+                
                 # check password first so we can output the warning before postgres
                 # messes it up
                 if [ "$POSTGRES_PASSWORD" ]; then
@@ -68,9 +78,19 @@ EOWARN
                         pass=
                         authMethod=trust
                 fi
+                
+                cat <<EOPGHBA > "$PGDATA/pg_hba.conf"
+# "local" is for Unix domain socket connections only
+local   all             all                                     trust
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            trust
+# IPv6 local connections:
+host    all             all             ::1/128                 trust
+EOPGHBA
 
-                { echo; echo "host all all 0.0.0.0/0 $authMethod"; } >> "$PGDATA/pg_hba.conf"
-                                
+               { echo; echo "host all all 0.0.0.0/0 $authMethod"; } >> "$PGDATA/pg_hba.conf"
+                chown postgres "$PGDATA/pg_hba.conf"
+                               
             else
                 gosu postgres initdb
 
@@ -151,16 +171,11 @@ EOSQL
             fi
         fi
 
-        
-        echo
-        echo 'PostgreSQL configure to /etc/postgres/postgresql.conf'
-        echo
-        envtpl /etc/postgres/postgresql.conf.tpl --allow-missing --keep-template
-
         echo
         echo 'Initiating PostgreSQL'
         echo
-        exec gosu postgres "$@" -c config_file=/etc/postgres/postgresql.conf
+        gosu postgres "$@" -c config_file=/etc/postgres/postgresql.conf
+
 
 elif [ "$1" = 'cron' ]; then
     configure_wale
