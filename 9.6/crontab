@@ -1,0 +1,3 @@
+# Wal-e crons for backup and clean old backups
+0 0 0 * *  /usr/bin/envdir /etc/wal-e.d/env /usr/local/bin/backup-wale.sh
+0 0 1 * *  /usr/bin/envdir /etc/wal-e.d/env /usr/local/bin/clean-wale.sh
