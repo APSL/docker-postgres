@@ -4,7 +4,7 @@ MAINTAINER Edu Herraiz <eherraiz@apsl.net>
 # Based on : https://github.com/appropriate/docker-postgis
 
 ENV POSTGIS_MAJOR 2.3
-ENV POSTGIS_VERSION 2.3.0+dfsg-2.pgdg80+1
+ENV POSTGIS_VERSION 2.3.3+dfsg-1.pgdg80+1
 ENV WALE_VERSION 1.0.1
 # useful for security updates
 ENV LAST_UPDATE 2016-11-08

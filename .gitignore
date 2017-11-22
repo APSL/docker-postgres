@@ -1,3 +1,4 @@
 docker-compose.yml
-docker-compose-redmine.yml
+docker-compose-*.yml
 .directory
+data
