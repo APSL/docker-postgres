@@ -1,5 +1,5 @@
 # https://hub.docker.com/_/postgres/
-FROM postgres:9.5
+FROM postgres:9.5.10
 MAINTAINER Edu Herraiz <eherraiz@apsl.net>
 # Based on : https://github.com/appropriate/docker-postgis
 
