@@ -25,7 +25,6 @@ file_env() {
 
 function configure_wale() {
     # Configure env dir for wal-e
-    whoami
     mkdir -p /etc/wal-e.d/env
     echo $AWS_ACCESS_KEY_ID > /etc/wal-e.d/env/AWS_ACCESS_KEY_ID
     echo $AWS_SECRET_ACCESS_KEY > /etc/wal-e.d/env/AWS_SECRET_ACCESS_KEY
