@@ -1,20 +1,20 @@
 # https://hub.docker.com/_/postgres/
-FROM postgres:9.6.1
+FROM postgres:9.6.6
 MAINTAINER Edu Herraiz <eherraiz@apsl.net>
 # Based on : https://github.com/appropriate/docker-postgis
 
 ENV POSTGIS_MAJOR 2.3
-ENV POSTGIS_VERSION 2.3.3+dfsg-1.pgdg80+1
 ENV WALE_VERSION 1.0.1
+
 # useful for security updates
-ENV LAST_UPDATE 2016-11-08
+ENV LAST_UPDATE 2017-11-23
 
 RUN apt-get update \
     && apt-get dist-upgrade -yd \
     && apt-get install -y --no-install-recommends \
-           postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR=$POSTGIS_VERSION \
-           postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts=$POSTGIS_VERSION \
-           postgis=$POSTGIS_VERSION \
+           postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
+           postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts \
+           postgis \
            lzop \
            python3 \
            python3-dev \
@@ -44,4 +44,4 @@ COPY go-cron /sbin/
 
 # Necessary overwrite to configure postgres via env vars
 # Original https://github.com/docker-library/postgres/blob/443c7947d548b1c607e06f7a75ca475de7ff3284/9.5/docker-entrypoint.sh
-COPY docker-entrypoint.sh /
+COPY docker-entrypoint.sh /usr/local/bin/

@@ -4,14 +4,10 @@ MAINTAINER Edu Herraiz <eherraiz@apsl.net>
 # Based on : https://github.com/appropriate/docker-postgis
 
 ENV POSTGIS_MAJOR 2.2
-ENV POSTGIS_VERSION 2.2.2+dfsg-7~137.gite11228b.pgdg80+1
 ENV WALE_VERSION 1.0.1
 
-#ENV POSTGIS_MAJOR 2.3
-#ENV POSTGIS_VERSION 2.3.0+dfsg-2.pgdg80+1
-#ENV WALE_VERSION 1.0.1
 # useful for security updates
-ENV LAST_UPDATE 2016-11-08
+ENV LAST_UPDATE 2017-11-23
 
 RUN apt-get update \
     && apt-get dist-upgrade -yd \
