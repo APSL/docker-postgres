@@ -48,8 +48,8 @@ function configure_wale() {
       export RECOVER_WALE_RECOVERY_TARGET_TIME='latest'
     fi
 
-    chown root:postgres -R /etc/wal-e.d
-    chmod 755 -R /etc/wal-e.d
+    chown postgres:postgres -R /etc/wal-e.d
+    chmod 777 -R /etc/wal-e.d
 }
 
 function configure_pg_hba() {
@@ -96,6 +96,8 @@ EOPGHBA
 
 }
 
+configure_wale
+
 if [ "${1:0:1}" = '-' ]; then
 	set -- postgres "$@"
 fi
@@ -108,8 +110,6 @@ if [ "$1" = 'postgres' ] && [ "$(id -u)" = '0' ]; then
     mkdir -p /var/run/postgresql
     chown -R postgres /var/run/postgresql
     chmod 775 /var/run/postgresql
-
-    configure_wale
 
     echo
     echo 'PostgreSQL configure to /etc/postgres/postgresql.conf'
@@ -227,7 +227,6 @@ EOSQL
   # exec gosu postgres "$@" -c config_file=/etc/postgres/postgresql.conf
 
 elif [ "$1" = 'cron' ]; then
-    configure_wale
     exec go-cron -file="/etc/postgres/crontab"
 fi
 
