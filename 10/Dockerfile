@@ -1,9 +1,9 @@
 # https://hub.docker.com/_/postgres/
-FROM postgres:9.6.6
+FROM postgres:10.1
 MAINTAINER Edu Herraiz <eherraiz@apsl.net>
 # Based on : https://github.com/appropriate/docker-postgis
 
-ENV POSTGIS_MAJOR 2.3
+ENV POSTGIS_MAJOR 2.4
 ENV WALE_VERSION 1.0.1
 
 # useful for security updates
