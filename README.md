@@ -8,7 +8,7 @@ Docker postgres
 ========================
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/apsl/postgres.svg)](https://hub.docker.com/r/apsl/postgres/)
-[![Docker Stars](https://img.shields.io/docker/stars/apsl/thumbor.svg)](https://hub.docker.com/r/apsl/postgres/)
+[![Docker Stars](https://img.shields.io/docker/stars/apsl/postgres.svg)](https://hub.docker.com/r/apsl/postgres/)
 [![Build Status](https://travis-ci.org/APSL/docker-postgres.svg?branch=master)](https://travis-ci.org/APSL/docker-postgres)
 
 * Docker image for postgresql
