@@ -645,5 +645,3 @@ default_text_search_config = 'pg_catalog.english'
 
 # https://www.postgresql.org/docs/9.6/static/runtime-config-resource.html#GUC-MAX-PARALLEL-WORKERS-PER-GATHER
 # 0 disabled
-max_parallel_workers_per_gather = {{ MAX_PARALLEL_WORKERS | default('0') }}
-huge_pages = off
